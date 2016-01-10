@@ -13,7 +13,6 @@ import (
 type Server struct {
 	pattern   string
 	processor thrift.TProcessor
-	clients   map[int]*Client
 	addCh     chan *Client
 	delCh     chan *Client
 	doneCh    chan bool
@@ -22,7 +21,6 @@ type Server struct {
 
 // NewServer creates new thrift websocket server.
 func NewServer(pattern string, processor thrift.TProcessor) *Server {
-	clients := make(map[int]*Client)
 	addCh := make(chan *Client)
 	delCh := make(chan *Client)
 	doneCh := make(chan bool)
@@ -31,7 +29,6 @@ func NewServer(pattern string, processor thrift.TProcessor) *Server {
 	return &Server{
 		pattern,
 		processor,
-		clients,
 		addCh,
 		delCh,
 		doneCh,
@@ -104,15 +101,12 @@ func (s *Server) Listen() {
 		select {
 
 		// Add new a client
-		case c := <-s.addCh:
+		case <-s.addCh:
 			log.Println("Added new client")
-			s.clients[c.id] = c
-			log.Println("Now", len(s.clients), "clients connected.")
 
 			// del a client
-		case c := <-s.delCh:
+		case <-s.delCh:
 			log.Println("Delete client")
-			delete(s.clients, c.id)
 
 		case err := <-s.errCh:
 			log.Println("Error:", err.Error())

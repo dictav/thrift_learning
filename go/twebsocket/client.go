@@ -10,11 +10,8 @@ import (
 
 const channelBufSize = 100
 
-var maxID int
-
 // Client struct
 type Client struct {
-	id     int
 	ws     *websocket.Conn
 	server *Server
 	ch     chan *string
@@ -32,11 +29,10 @@ func NewClient(ws *websocket.Conn, server *Server) *Client {
 		panic("server cannot be nil")
 	}
 
-	maxID++
 	ch := make(chan *string, channelBufSize)
 	doneCh := make(chan bool)
 
-	return &Client{maxID, ws, server, ch, doneCh}
+	return &Client{ws, server, ch, doneCh}
 }
 
 // Conn function
@@ -50,7 +46,7 @@ func (c *Client) Write(msg *string) {
 	case c.ch <- msg:
 	default:
 		c.server.Del(c)
-		err := fmt.Errorf("client %d is disconnected", c.id)
+		err := fmt.Errorf("client is disconnected")
 		c.server.Err(err)
 	}
 }
