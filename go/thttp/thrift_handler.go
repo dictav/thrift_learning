@@ -11,6 +11,11 @@ import (
 // NewThriftHandler retuns http.Handler
 func NewThriftHandler(processor thrift.TProcessor) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != `POST` {
+			http.Error(w, "Thrift Handler requires POST access", http.StatusInternalServerError)
+			return
+		}
+
 		buffer := new(bytes.Buffer)
 		_, err := buffer.ReadFrom(r.Body)
 		if err != nil {

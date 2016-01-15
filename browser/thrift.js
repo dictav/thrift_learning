@@ -291,6 +291,7 @@ Thrift.Transport = Thrift.TXHRTransport = function(url, options) {
     this.wpos = 0;
     this.rpos = 0;
     this.useCORS = (options && options.useCORS);
+    this.authToken = options.token;
     this.send_buf = '';
     this.recv_buf = '';
 };
@@ -360,6 +361,7 @@ Thrift.TXHRTransport.prototype = {
         if (xreq.setRequestHeader) {
             xreq.setRequestHeader('Accept', 'application/vnd.apache.thrift.json; charset=utf-8');
             xreq.setRequestHeader('Content-Type', 'application/vnd.apache.thrift.json; charset=utf-8');
+            xreq.setRequestHeader('X-Mauth-Token', this.authToken);
         }
 
         xreq.send(this.send_buf);
